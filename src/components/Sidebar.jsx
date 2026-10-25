@@ -12,6 +12,8 @@ import {
   HeartPulse,
   X,
   Shield,
+  CalendarClock,
+  ShieldCheck,
 } from 'lucide-react';
 import { ROLE_PERMISSIONS, ROLES } from '../data/initialData';
 
@@ -20,12 +22,14 @@ export default function Sidebar({ activeTab, setActiveTab, currentRole, mobileOp
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'opd', label: 'OPD', icon: Users },
     { id: 'ipd', label: 'IPD', icon: Bed },
+    { id: 'appointments', label: 'Appointments', icon: CalendarClock },
     { id: 'radiology', label: 'Radiology', icon: Scan },
     { id: 'pathology', label: 'Pathology', icon: FlaskConical },
     { id: 'doctors', label: 'Doctor Available', icon: Stethoscope },
     { id: 'billings', label: 'Billings', icon: Receipt },
     { id: 'finances', label: 'Expenses or Income', icon: TrendingUp },
     { id: 'ambulance', label: 'Ambulance', icon: Ambulance },
+    { id: 'admin-audit', label: 'Admin & Audit', icon: ShieldCheck },
   ];
 
   const roleConfig = ROLE_PERMISSIONS[currentRole] || ROLE_PERMISSIONS.admin;
@@ -61,8 +65,8 @@ export default function Sidebar({ activeTab, setActiveTab, currentRole, mobileOp
               <HeartPulse size={20} color="#0b1e36" strokeWidth={2.5} />
             </div>
             <div style={{ overflow: 'hidden' }}>
-              <div className="sidebar-logo-text">CarePulse</div>
-              <div className="sidebar-logo-sub">Navy Medical HMS</div>
+              <div className="sidebar-logo-text">Arogya Hospital</div>
+              <div className="sidebar-logo-sub">Advanced Multi-Specialty HMS</div>
             </div>
           </div>
 

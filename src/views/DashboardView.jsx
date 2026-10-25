@@ -12,6 +12,7 @@ import {
   FileText,
   Activity,
   ArrowRight,
+  CalendarClock,
 } from 'lucide-react';
 import StatCard from '../components/StatCard';
 
@@ -61,6 +62,9 @@ export default function DashboardView({
           <p className="page-subtitle">Real-time metrics, emergency bay status, and clinical operations</p>
         </div>
         <div className="page-actions">
+          <button className="btn btn-white" onClick={() => setActiveTab('appointments')}>
+            <CalendarClock size={16} /> Appointments
+          </button>
           <button className="btn btn-white" onClick={() => setActiveTab('opd')}>
             <PlusCircle size={16} /> New OPD Token
           </button>

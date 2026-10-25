@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, ChevronDown, Clock, Shield, Menu } from 'lucide-react';
+import { Search, ChevronDown, Clock, Menu, Sun, Moon, Bell, LogOut } from 'lucide-react';
 import { ROLES, ROLE_PERMISSIONS } from '../data/initialData';
+import NotificationDropdown from './NotificationDropdown';
 
 export default function Navbar({
   currentRole,
@@ -8,21 +9,33 @@ export default function Navbar({
   searchQuery,
   setSearchQuery,
   setMobileOpen,
+  theme,
+  toggleTheme,
+  notifications,
+  setNotifications,
+  onNavigateTab,
+  onSignOut,
 }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
+
   const dropdownRef = useRef(null);
+  const notifRef = useRef(null);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
-  // Click outside listener for dropdown
+  // Click outside listener for dropdowns
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setDropdownOpen(false);
+      }
+      if (notifRef.current && !notifRef.current.contains(event.target)) {
+        setNotifOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -31,6 +44,9 @@ export default function Navbar({
 
   const activeRoleData = ROLES.find((r) => r.id === currentRole) || ROLES[0];
   const roleConfig = ROLE_PERMISSIONS[currentRole] || ROLE_PERMISSIONS.admin;
+
+  const unreadNotifs = notifications ? notifications.filter((n) => !n.read).length : 0;
+  const hasCritical = notifications ? notifications.some((n) => !n.read && n.type === 'critical') : false;
 
   return (
     <header className="top-navbar">
@@ -42,7 +58,7 @@ export default function Navbar({
           aria-label="Open navigation menu"
           title="Open Menu"
         >
-          <Menu size={22} color="#0f2746" />
+          <Menu size={22} color="var(--navy-900)" />
         </button>
 
         {/* Global Search Input */}
@@ -58,12 +74,52 @@ export default function Navbar({
       </div>
 
       <div className="nav-right">
-        {/* Live Hospital Clock (hidden on narrow phones to prevent overflow) */}
+        {/* Live Hospital Clock */}
         <div className="live-clock">
           <Clock size={14} />
           <span>
             {currentTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
           </span>
+        </div>
+
+        {/* Theme Toggle (Dark / Light Mode) */}
+        <button
+          className="theme-toggle-btn"
+          onClick={toggleTheme}
+          aria-label={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} mode`}
+          title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
+        >
+          {theme === 'dark' ? (
+            <Sun size={18} className="theme-icon sun-icon" />
+          ) : (
+            <Moon size={18} className="theme-icon moon-icon" />
+          )}
+        </button>
+
+        {/* Notification Bell Dropdown */}
+        <div style={{ position: 'relative' }} ref={notifRef}>
+          <button
+            className={`nav-icon-btn notif-bell-btn ${notifOpen ? 'active' : ''}`}
+            onClick={() => setNotifOpen(!notifOpen)}
+            aria-label="Hospital Notifications"
+            title="Hospital Notifications & Alerts"
+          >
+            <Bell size={18} />
+            {unreadNotifs > 0 && (
+              <span className={`notif-unread-badge ${hasCritical ? 'badge-critical-pulse' : ''}`}>
+                {unreadNotifs}
+              </span>
+            )}
+          </button>
+
+          {notifOpen && (
+            <NotificationDropdown
+              notifications={notifications}
+              setNotifications={setNotifications}
+              onClose={() => setNotifOpen(false)}
+              onNavigateTab={onNavigateTab}
+            />
+          )}
         </div>
 
         {/* Role Switcher with RBAC indicator */}
@@ -82,7 +138,7 @@ export default function Navbar({
                 {activeRoleData.label} • {roleConfig.badge}
               </div>
             </div>
-            <ChevronDown size={14} color="#64748b" />
+            <ChevronDown size={14} color="var(--text-muted)" />
           </button>
 
           {dropdownOpen && (
@@ -111,14 +167,14 @@ export default function Navbar({
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                          <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#0f172a' }}>
+                          <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-main)' }}>
                             {r.label}
                           </span>
                           <span
                             style={{
                               fontSize: '0.65rem',
                               fontWeight: 600,
-                              color: isCurrent ? '#1d4ed8' : '#64748b',
+                              color: isCurrent ? 'var(--accent-blue)' : 'var(--text-muted)',
                             }}
                           >
                             {perm?.badge}
@@ -127,7 +183,7 @@ export default function Navbar({
                         <div
                           style={{
                             fontSize: '0.68rem',
-                            color: '#64748b',
+                            color: 'var(--text-muted)',
                             whiteSpace: 'nowrap',
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
@@ -143,6 +199,18 @@ export default function Navbar({
             </div>
           )}
         </div>
+
+        {/* Sign Out Button to return to Demo Sign-in */}
+        {onSignOut && (
+          <button
+            className="nav-icon-btn logout-btn"
+            onClick={onSignOut}
+            title="Sign Out to Arogya Hospital Demo Screen"
+            aria-label="Sign Out"
+          >
+            <LogOut size={16} />
+          </button>
+        )}
       </div>
     </header>
   );
